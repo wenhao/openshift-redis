@@ -1,4 +1,4 @@
-FROM alpine:latest
+FROM centos:latest
 
 RUN yum install redis hostname -y ; yum clean all
 
