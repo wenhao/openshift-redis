@@ -58,13 +58,6 @@ objects:
               ports:
                 - containerPort: 6379
                   protocol: TCP
-              env:
-                - name: REDIS_MASTER_SERVICE_HOST
-                  value: "${REDIS_SERVICE_NAME}-redis-master.${NAMESPACE}.svc"
-                - name: REDIS_SENTINEL_SERVICE_HOST
-                  value: "${REDIS_SERVICE_NAME}-redis-sentinel.${NAMESPACE}.svc"
-                - name: REDIS_SENTINEL_SERVICE_PORT
-                  value: "26379"
               resources: {}
               terminationMessagePath: /dev/termination-log
               volumeMounts:
@@ -142,12 +135,6 @@ objects:
               env:
                 - name: MASTER
                   value: "true"
-                - name: REDIS_MASTER_SERVICE_HOST
-                  value: "${REDIS_SERVICE_NAME}-redis-master.${NAMESPACE}.svc"
-                - name: REDIS_SENTINEL_SERVICE_HOST
-                  value: "${REDIS_SERVICE_NAME}-redis-sentinel.${NAMESPACE}.svc"
-                - name: REDIS_SENTINEL_SERVICE_PORT
-                  value: "26379"
               resources: {}
               terminationMessagePath: /dev/termination-log
               volumeMounts:
@@ -211,10 +198,6 @@ objects:
                   value: "true"
                 - name: REDIS_MASTER_SERVICE_HOST
                   value: "${REDIS_SERVICE_NAME}-redis-master.${NAMESPACE}.svc"
-                - name: REDIS_SENTINEL_SERVICE_HOST
-                  value: "${REDIS_SERVICE_NAME}-redis-sentinel.${NAMESPACE}.svc"
-                - name: REDIS_SENTINEL_SERVICE_PORT
-                  value: "26379"
               resources: {}
               terminationMessagePath: /dev/termination-log
               volumeMounts:

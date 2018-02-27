@@ -28,7 +28,7 @@ function launchsentinel() {
     if [[ -n ${master} ]]; then
       master="${master//\"}"
     else
-      master=$(hostname -i)
+      master="${REDIS_MASTER_SERVICE_HOST}"
     fi
 
     redis-cli -h ${master} INFO
