@@ -19,7 +19,7 @@ function launchmaster() {
     echo "Redis master data doesn't exist, data won't be persistent!"
     mkdir /redis-master-data
   fi
-  redis-server /redis/redis-master/redis.conf --protected-mode no
+  redis-server /redis-master/redis.conf --protected-mode no
 }
 
 function launchsentinel() {
@@ -67,9 +67,9 @@ function launchslave() {
     echo "Connecting to master failed.  Waiting..."
     sleep 10
   done
-  sed -i "s/%master-ip%/${master}/" /redis/redis-slave/redis.conf
-  sed -i "s/%master-port%/6379/" /redis/redis-slave/redis.conf
-  redis-server /redis/redis-slave/redis.conf --protected-mode no
+  sed -i "s/%master-ip%/${master}/" /redis-slave/redis.conf
+  sed -i "s/%master-port%/6379/" /redis-slave/redis.conf
+  redis-server /redis-slave/redis.conf --protected-mode no
 }
 
 if [[ "${MASTER}" == "true" ]]; then

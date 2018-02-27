@@ -7,10 +7,10 @@ RUN set -x \
     && echo "Asia/Shanghai" > /etc/timezone \
     && apk del --no-cache tzdata
 
-COPY redis-master.conf /redis/redis-master/redis.conf
-COPY redis-slave.conf /redis/redis-slave/redis.conf
-COPY run.sh /redis/run.sh
+COPY redis-master.conf /redis-master/redis.conf
+COPY redis-slave.conf /redis-slave/redis.conf
+COPY run.sh /run.sh
 
-CMD [ "/redis/run.sh" ]
+CMD [ "/run.sh" ]
 
 ENTRYPOINT [ "bash", "-c" ]
