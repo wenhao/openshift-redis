@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright 2014 The Kubernetes Authors All rights reserved.
+# Copyright 2014 The Kubernetes Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,11 +15,11 @@
 # limitations under the License.
 
 function launchmaster() {
-  if [[ ! -e /redis/redis-master-data ]]; then
+  if [[ ! -e /redis-master-data ]]; then
     echo "Redis master data doesn't exist, data won't be persistent!"
-    mkdir /redis/redis-master-data
+    mkdir /redis-master-data
   fi
-  redis-server /redis/redis-master/redis.conf
+  redis-server /redis/redis-master/redis.conf --protected-mode no
 }
 
 function launchsentinel() {
@@ -28,7 +28,7 @@ function launchsentinel() {
     if [[ -n ${master} ]]; then
       master="${master//\"}"
     else
-      master="${REDIS_MASTER_SERVICE_HOST}"
+      master=$(hostname -i)
     fi
 
     redis-cli -h ${master} INFO
@@ -39,14 +39,15 @@ function launchsentinel() {
     sleep 10
   done
 
-  sentinel_conf=/redis/redis-sentinel/sentinel.conf
+  sentinel_conf=sentinel.conf
 
   echo "sentinel monitor mymaster ${master} 6379 2" > ${sentinel_conf}
   echo "sentinel down-after-milliseconds mymaster 60000" >> ${sentinel_conf}
   echo "sentinel failover-timeout mymaster 180000" >> ${sentinel_conf}
   echo "sentinel parallel-syncs mymaster 1" >> ${sentinel_conf}
+  echo "bind 0.0.0.0" >> ${sentinel_conf}
 
-  redis-sentinel ${sentinel_conf}
+  redis-sentinel ${sentinel_conf} --protected-mode no
 }
 
 function launchslave() {
@@ -68,7 +69,7 @@ function launchslave() {
   done
   sed -i "s/%master-ip%/${master}/" /redis/redis-slave/redis.conf
   sed -i "s/%master-port%/6379/" /redis/redis-slave/redis.conf
-  redis-server /redis/redis-slave/redis.conf
+  redis-server /redis/redis-slave/redis.conf --protected-mode no
 }
 
 if [[ "${MASTER}" == "true" ]]; then

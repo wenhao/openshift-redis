@@ -52,26 +52,31 @@ objects:
             app: "${REDIS_SERVICE_NAME}-redis"
         spec:
           containers:
-          - image: ' '
-            imagePullPolicy: Always
-            name: redis
-            ports:
-            - containerPort: 6379
-              protocol: TCP
-            resources: {}
-            terminationMessagePath: /dev/termination-log
-            volumeMounts:
-            - mountPath: /redis-master-data
+            - name: redis
+              image: ' '
+              imagePullPolicy: Always
+              ports:
+                - containerPort: 6379
+                  protocol: TCP
+              env:
+                - name: REDIS_MASTER_SERVICE_HOST
+                  value: "${REDIS_SERVICE_NAME}-redis-master.${NAMESPACE}.svc"
+                - name: REDIS_SENTINEL_SERVICE_HOST
+                  value: "${REDIS_SERVICE_NAME}-redis-sentinel.${NAMESPACE}.svc"
+                - name: REDIS_SENTINEL_SERVICE_PORT
+                  value: "26379"
+              resources: {}
+              terminationMessagePath: /dev/termination-log
+              volumeMounts:
+                - mountPath: /redis-master-data
+                  name: data
+          volumes:
+            - emptyDir: {}
               name: data
           dnsPolicy: ClusterFirst
           restartPolicy: Always
           securityContext: {}
           terminationGracePeriodSeconds: 30
-          volumes:
-          - emptyDir: {}
-            name: data
-      test: false
-    status: {}
   - apiVersion: v1
     kind: DeploymentConfig
     metadata:
@@ -121,7 +126,6 @@ objects:
         - type: ConfigChange
       template:
         metadata:
-          creationTimestamp: null
           labels:
             app: "${REDIS_SERVICE_NAME}-redis-master"
             redis-master: "true"
@@ -129,40 +133,33 @@ objects:
             role: master
         spec:
           containers:
-          - env:
-            - name: MASTER
-              value: "true"
-            image: ' '
-            imagePullPolicy: Always
-            name: redis
-            ports:
-            - containerPort: 6379
-              protocol: TCP
-            resources: {}
-            terminationMessagePath: /dev/termination-log
-            volumeMounts:
-            - mountPath: /redis-master-data
-              name: data
-          - env:
-            - name: SENTINEL
-              value: "true"
-            image: ' '
-            imagePullPolicy: Always
-            name: sentinel
-            ports:
-            - containerPort: 26379
-              protocol: TCP
-            resources: {}
-            terminationMessagePath: /dev/termination-log
+            - name: redis
+              image: ' '
+              imagePullPolicy: Always
+              ports:
+                - containerPort: 6379
+                  protocol: TCP
+              env:
+                - name: MASTER
+                  value: "true"
+                - name: REDIS_MASTER_SERVICE_HOST
+                  value: "${REDIS_SERVICE_NAME}-redis-master.${NAMESPACE}.svc"
+                - name: REDIS_SENTINEL_SERVICE_HOST
+                  value: "${REDIS_SERVICE_NAME}-redis-sentinel.${NAMESPACE}.svc"
+                - name: REDIS_SENTINEL_SERVICE_PORT
+                  value: "26379"
+              resources: {}
+              terminationMessagePath: /dev/termination-log
+              volumeMounts:
+                - mountPath: /redis-master-data
+                  name: data
           dnsPolicy: ClusterFirst
           restartPolicy: Always
           securityContext: {}
           terminationGracePeriodSeconds: 30
           volumes:
-          - emptyDir: {}
-            name: data
-      test: false
-    status: {}
+            - emptyDir: {}
+              name: data
   - apiVersion: v1
     kind: DeploymentConfig
     metadata:
@@ -198,35 +195,38 @@ objects:
               namespace: "${NAMESPACE}"
       template:
         metadata:
-          creationTimestamp: null
           labels:
             app: "${REDIS_SERVICE_NAME}-redis-sentinel"
             redis-sentinel: "true"
         spec:
           containers:
-          - env:
-            - name: SENTINEL
-              value: "true"
-            image: ' '
-            imagePullPolicy: Always
-            name: sentinel
-            ports:
-            - containerPort: 26379
-              protocol: TCP
-            resources: {}
-            terminationMessagePath: /dev/termination-log
-            volumeMounts:
-            - mountPath: /redis-master-data
-              name: data
+            - name: sentinel
+              image: ' '
+              imagePullPolicy: Always
+              ports:
+                - containerPort: 26379
+                  protocol: TCP
+              env:
+                - name: SENTINEL
+                  value: "true"
+                - name: REDIS_MASTER_SERVICE_HOST
+                  value: "${REDIS_SERVICE_NAME}-redis-master.${NAMESPACE}.svc"
+                - name: REDIS_SENTINEL_SERVICE_HOST
+                  value: "${REDIS_SERVICE_NAME}-redis-sentinel.${NAMESPACE}.svc"
+                - name: REDIS_SENTINEL_SERVICE_PORT
+                  value: "26379"
+              resources: {}
+              terminationMessagePath: /dev/termination-log
+              volumeMounts:
+                - mountPath: /redis-master-data
+                  name: data
           dnsPolicy: ClusterFirst
           restartPolicy: Always
           securityContext: {}
           terminationGracePeriodSeconds: 30
           volumes:
-          - emptyDir: {}
-            name: data
-      test: false
-    status: {}
+            - emptyDir: {}
+              name: data
   - apiVersion: v1
     kind: Service
     metadata:
