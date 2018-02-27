@@ -49,4 +49,4 @@ RUN chmod +x /run.sh
 
 CMD [ "/run.sh" ]
 
-ENTRYPOINT [ "bash", "-c" ]
+ENTRYPOINT [ "sh", "-c" ]
