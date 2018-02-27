@@ -15,11 +15,11 @@
 # limitations under the License.
 
 function launchmaster() {
-  if [[ ! -e /redis-master-data ]]; then
+  if [[ ! -e /redis/redis-master-data ]]; then
     echo "Redis master data doesn't exist, data won't be persistent!"
-    mkdir /redis-master-data
+    mkdir /redis/redis-master-data
   fi
-  redis-server /redis-master/redis.conf
+  redis-server /redis/redis-master/redis.conf
 }
 
 function launchsentinel() {
@@ -39,7 +39,7 @@ function launchsentinel() {
     sleep 10
   done
 
-  sentinel_conf=/redis-sentinel/sentinel.conf
+  sentinel_conf=/redis/redis-sentinel/sentinel.conf
 
   echo "sentinel monitor mymaster ${master} 6379 2" > ${sentinel_conf}
   echo "sentinel down-after-milliseconds mymaster 60000" >> ${sentinel_conf}
@@ -66,9 +66,9 @@ function launchslave() {
     echo "Connecting to master failed.  Waiting..."
     sleep 10
   done
-  sed -i "s/%master-ip%/${master}/" /redis-slave/redis.conf
-  sed -i "s/%master-port%/6379/" /redis-slave/redis.conf
-  redis-server /redis-slave/redis.conf
+  sed -i "s/%master-ip%/${master}/" /redis/redis-slave/redis.conf
+  sed -i "s/%master-port%/6379/" /redis/redis-slave/redis.conf
+  redis-server /redis/redis-slave/redis.conf
 }
 
 if [[ "${MASTER}" == "true" ]]; then
