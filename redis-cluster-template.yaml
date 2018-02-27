@@ -4,7 +4,7 @@ metadata:
   name: "redis-cluster"
   annotations:
     openshift.io/display-name: "Redis Cluster"
-    openshift.io/long-description: "This template provides a Redis cluster.
+    openshift.io/long-description: "This template provides a Redis cluster."
     openshift.io/provider-display-name: "Wen Hao."
     openshift.io/support-url: "https://wenhao.github.io"
     description: "Redis cluster service."
@@ -45,7 +45,6 @@ objects:
               kind: ImageStreamTag
               name: "redis:${VERSION}"
               namespace: "${NAMESPACE}"
-          type: ImageChange
       template:
         metadata:
           creationTimestamp: null
@@ -101,24 +100,24 @@ objects:
           updatePeriodSeconds: 1
         type: Rolling
       triggers:
-        - imageChangeParams:
-          automatic: true
-          containerNames:
-            - redis
-          from:
-            kind: ImageStreamTag
-            name: "redis:${VERSION}"
-            namespace: "{NAMESPACE}"
-        type: ImageChange
-        - imageChangeParams:
+        - type: ImageChange
+          imageChangeParams:
+            automatic: true
+            containerNames:
+              - redis
+            from:
+              kind: ImageStreamTag
+              name: "redis:${VERSION}"
+              namespace: "${NAMESPACE}"
+        - type: ImageChange
+          imageChangeParams:
             automatic: true
             containerNames:
               - sentinel
             from:
               kind: ImageStreamTag
               name: "redis:${VERSION}"
-              namespace: "{NAMESPACE}"
-          type: ImageChange
+              namespace: "${NAMESPACE}"
         - type: ConfigChange
       template:
         metadata:
@@ -192,12 +191,11 @@ objects:
           imageChangeParams:
             automatic: true
             containerNames:
-            - sentinel
+              - sentinel
             from:
               kind: ImageStreamTag
               name: "redis:${VERSION}"
-              namespace: "{NAMESPACE}"
-          type: ImageChange
+              namespace: "${NAMESPACE}"
       template:
         metadata:
           creationTimestamp: null
@@ -234,6 +232,7 @@ objects:
     metadata:
       creationTimestamp: null
       labels:
+        app: "${REDIS_SERVICE_NAME}-redis-master"
         name: master
         role: service
       name: "${REDIS_SERVICE_NAME}-redis-master"
@@ -253,6 +252,7 @@ objects:
     metadata:
       creationTimestamp: null
       labels:
+        app: "${REDIS_SERVICE_NAME}-redis-sentinel"
         name: sentinel
         role: service
       name: "${REDIS_SERVICE_NAME}-redis-sentinel"
