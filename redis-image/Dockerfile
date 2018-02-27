@@ -1,4 +1,4 @@
-FROM alpine:latest
+FROM ubuntu:latest
 
 # grab su-exec for easy step-down from root
 RUN apk add --no-cache 'su-exec>=0.2'
