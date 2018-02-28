@@ -19,66 +19,6 @@ objects:
     metadata:
       generation: 1
       labels:
-        app: "${REDIS_SERVICE_NAME}-redis"
-      name: "${REDIS_SERVICE_NAME}-redis"
-    spec:
-      replicas: 3
-      selector:
-        app: "${REDIS_SERVICE_NAME}-redis"
-      strategy:
-        resources: {}
-        rollingParams:
-          intervalSeconds: 1
-          maxSurge: 25%
-          maxUnavailable: 25%
-          timeoutSeconds: 600
-          updatePeriodSeconds: 1
-        type: Rolling
-      triggers:
-        - type: ConfigChange
-          imageChangeParams:
-            automatic: true
-            containerNames:
-              - redis
-            from:
-              kind: ImageStreamTag
-              name: "redis:${VERSION}"
-              namespace: "${NAMESPACE}"
-      template:
-        metadata:
-          creationTimestamp: null
-          labels:
-            app: "${REDIS_SERVICE_NAME}-redis"
-        spec:
-          containers:
-            - name: redis
-              image: ' '
-              imagePullPolicy: Always
-              ports:
-                - containerPort: 6379
-                  protocol: TCP
-              env:
-                - name: REDIS_SENTINEL_SERVICE_HOST
-                  value: "${REDIS_SERVICE_NAME}-redis-sentinel.${NAMESPACE}.svc"
-                - name: REDIS_SENTINEL_SERVICE_PORT
-                  value: "26379"
-              resources: {}
-              terminationMessagePath: /dev/termination-log
-              volumeMounts:
-                - mountPath: /redis-master-data
-                  name: data
-          volumes:
-            - emptyDir: {}
-              name: data
-          dnsPolicy: ClusterFirst
-          restartPolicy: Always
-          securityContext: {}
-          terminationGracePeriodSeconds: 30
-  - apiVersion: v1
-    kind: DeploymentConfig
-    metadata:
-      generation: 1
-      labels:
         app: "${REDIS_SERVICE_NAME}-redis-master"
         redis-master: "true"
         redis-sentinel: "true"
@@ -92,7 +32,6 @@ objects:
         redis-sentinel: "true"
         role: master
       strategy:
-        resources: {}
         rollingParams:
           intervalSeconds: 1
           maxSurge: 25%
@@ -138,7 +77,9 @@ objects:
               env:
                 - name: MASTER
                   value: "true"
-              resources: {}
+              resources:
+                limits:
+                  memory: "4Gi"
               terminationMessagePath: /dev/termination-log
               volumeMounts:
                 - mountPath: /redis-master-data
@@ -150,6 +91,68 @@ objects:
           volumes:
             - emptyDir: {}
               name: data
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    generation: 1
+    labels:
+      app: "${REDIS_SERVICE_NAME}-redis"
+    name: "${REDIS_SERVICE_NAME}-redis"
+  spec:
+    replicas: 3
+    selector:
+      app: "${REDIS_SERVICE_NAME}-redis"
+    strategy:
+      resources: {}
+      rollingParams:
+        intervalSeconds: 1
+        maxSurge: 25%
+        maxUnavailable: 25%
+        timeoutSeconds: 600
+        updatePeriodSeconds: 1
+      type: Rolling
+    triggers:
+      - type: ConfigChange
+        imageChangeParams:
+          automatic: true
+          containerNames:
+            - redis
+          from:
+            kind: ImageStreamTag
+            name: "redis:${VERSION}"
+            namespace: "${NAMESPACE}"
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app: "${REDIS_SERVICE_NAME}-redis"
+      spec:
+        containers:
+          - name: redis
+            image: ' '
+            imagePullPolicy: Always
+            ports:
+              - containerPort: 6379
+                protocol: TCP
+            env:
+              - name: REDIS_SENTINEL_SERVICE_HOST
+                value: "${REDIS_SERVICE_NAME}-redis-sentinel.${NAMESPACE}.svc"
+              - name: REDIS_SENTINEL_SERVICE_PORT
+                value: "26379"
+            resources:
+              limits:
+                memory: "4Gi"
+            terminationMessagePath: /dev/termination-log
+            volumeMounts:
+              - mountPath: /redis-master-data
+                name: data
+        volumes:
+          - emptyDir: {}
+            name: data
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        securityContext: {}
+        terminationGracePeriodSeconds: 30              
   - apiVersion: v1
     kind: DeploymentConfig
     metadata:
@@ -164,7 +167,6 @@ objects:
         app: "${REDIS_SERVICE_NAME}-redis-sentinel"
         redis-sentinel: "true"
       strategy:
-        resources: {}
         rollingParams:
           intervalSeconds: 1
           maxSurge: 25%
@@ -200,7 +202,9 @@ objects:
                   value: "true"
                 - name: REDIS_MASTER_SERVICE_HOST
                   value: "${REDIS_SERVICE_NAME}-redis-master.${NAMESPACE}.svc"
-              resources: {}
+              resources:
+                limits:
+                  memory: "4Gi"
               terminationMessagePath: /dev/termination-log
               volumeMounts:
                 - mountPath: /redis-master-data
