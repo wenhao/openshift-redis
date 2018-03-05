@@ -70,7 +70,7 @@ objects:
                   value: "true"
               resources:
                 limits:
-                  memory: "4Gi"
+                  memory: "${MEMORY_LIMIT}"
               terminationMessagePath: /dev/termination-log
               volumeMounts:
                 - mountPath: /redis-master-data
@@ -132,7 +132,7 @@ objects:
                 value: "26379"
             resources:
               limits:
-                memory: "4Gi"
+                memory: "${MEMORY_LIMIT}"
             terminationMessagePath: /dev/termination-log
             volumeMounts:
               - mountPath: /redis-master-data
@@ -195,7 +195,7 @@ objects:
                   value: "${REDIS_SERVICE_NAME}-redis-master.${NAMESPACE}.svc"
               resources:
                 limits:
-                  memory: "4Gi"
+                  memory: "${MEMORY_LIMIT}"
               terminationMessagePath: /dev/termination-log
               volumeMounts:
                 - mountPath: /redis-master-data
@@ -254,6 +254,11 @@ parameters:
     displayName: "Redis Service Name"
     description: "The name of the OpenShift Service exposed for the Redis cluster, pre-set a suffix '-redis'."
     value: redis
+    equired: true
+  - MEMORY_LIMIT:
+    displayName: "Memory Limit"
+    description: "Maximum amount of memory the container can use."
+    value: "4Gi"
     equired: true
   - name: VERSION
     displayName: "Version of Redis"
