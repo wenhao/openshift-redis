@@ -103,7 +103,7 @@ objects:
           updatePeriodSeconds: 1
         type: Rolling
       triggers:
-        - type: ConfigChange
+        - type: ImageChange
           imageChangeParams:
             automatic: true
             containerNames:
@@ -166,7 +166,7 @@ objects:
           updatePeriodSeconds: 1
         type: Rolling
       triggers:
-        - type: ConfigChange
+        - type: ImageChange
           imageChangeParams:
             automatic: true
             containerNames:
