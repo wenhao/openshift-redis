@@ -1,0 +1,48 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    redis-sentinel: "true"
+    role: master
+    app: "${REDIS_SERVICE_NAME}-redis-master"
+  name: "${REDIS_SERVICE_NAME}-redis-master"
+spec:
+  containers:
+    containers:
+      - name: master
+        image: ' '
+        imagePullPolicy: Always
+        ports:
+          - containerPort: 6379
+            protocol: TCP
+        env:
+          - name: MASTER
+            value: "true"
+        resources:
+          limits:
+            memory: "${MEMORY_LIMIT}"
+        terminationMessagePath: /dev/termination-log
+        volumeMounts:
+          - mountPath: /redis-master-data
+            name: data
+      - name: sentinel
+        image: ' '
+        imagePullPolicy: Always
+        ports:
+          - containerPort: 26379
+            protocol: TCP
+        env:
+          - name: SENTINEL
+            value: "true"
+        resources:
+          limits:
+            memory: "${MEMORY_LIMIT}"
+        terminationMessagePath: /dev/termination-log
+        volumeMounts:
+          - mountPath: /redis-sentinel-data
+            name: data-sentinel
+    volumes:
+      - name: data
+        emptyDir: {}
+      - name: data-sentinel
+        emptyDir: {}        
