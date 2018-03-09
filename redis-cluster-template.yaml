@@ -59,7 +59,7 @@ objects:
             role: master
         spec:
           containers:
-            - name: redis
+            - name: master
               image: ' '
               imagePullPolicy: Always
               ports:
@@ -75,13 +75,31 @@ objects:
               volumeMounts:
                 - mountPath: /redis-master-data
                   name: data
+            - name: sentinel
+              image: ' '
+              imagePullPolicy: Always
+              ports:
+                - containerPort: 26379
+                  protocol: TCP
+              env:
+                - name: SENTINEL
+                  value: "true"
+              resources:
+                limits:
+                  memory: "${MEMORY_LIMIT}"
+              terminationMessagePath: /dev/termination-log
+              volumeMounts:
+                - mountPath: /redis-sentinel-data
+                  name: data-sentinel
           dnsPolicy: ClusterFirst
           restartPolicy: Always
           securityContext: {}
           terminationGracePeriodSeconds: 30
           volumes:
-            - emptyDir: {}
-              name: data
+            - name: data
+              emptyDir: {}
+            - name: data-sentinel
+              emptyDir: {}
   - apiVersion: v1
     kind: DeploymentConfig
     metadata:
