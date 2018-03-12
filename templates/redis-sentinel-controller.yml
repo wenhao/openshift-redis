@@ -17,16 +17,6 @@ spec:
       timeoutSeconds: 600
       updatePeriodSeconds: 1
     type: Rolling
-  triggers:
-    - type: ImageChange
-      imageChangeParams:
-        automatic: true
-        containerNames:
-          - sentinel
-        from:
-          kind: ImageStreamTag
-          name: "redis:${VERSION}"
-          namespace: "${NAMESPACE}"
   template:
     metadata:
       labels:
@@ -36,7 +26,7 @@ spec:
     spec:
       containers:
         - name: sentinel
-          image: ' '
+          image: redis:v1.0.0
           imagePullPolicy: Always
           ports:
             - containerPort: 26379
@@ -44,8 +34,10 @@ spec:
           env:
             - name: SENTINEL
               value: "true"
-            - name: REDIS_MASTER_SERVICE_HOST
-              value: "${REDIS_SERVICE_NAME}-redis-master.${NAMESPACE}.svc"
+            - name: REDIS_SENTINEL_SERVICE_HOST
+              value: "${REDIS_SERVICE_NAME}-redis-sentinel.${NAMESPACE}.svc"
+            - name: REDIS_SENTINEL_SERVICE_PORT
+              value: "26379"
           resources:
             limits:
               memory: "${MEMORY_LIMIT}"
@@ -55,4 +47,4 @@ spec:
               name: data
       volumes:
         - emptyDir: {}
-          name: data        
+          name: data

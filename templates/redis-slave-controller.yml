@@ -16,16 +16,6 @@ spec:
       timeoutSeconds: 600
       updatePeriodSeconds: 1
     type: Rolling
-  triggers:
-    - type: ImageChange
-      imageChangeParams:
-        automatic: true
-        containerNames:
-          - sentinel
-        from:
-          kind: ImageStreamTag
-          name: "redis:${VERSION}"
-          namespace: "${NAMESPACE}"    
   template:
     metadata:
       labels:
@@ -33,7 +23,7 @@ spec:
     spec:
       containers:
         - name: redis
-          image: ' '
+          image: redis:v1.0.0
           imagePullPolicy: Always
           ports:
             - containerPort: 6379

@@ -8,41 +8,40 @@ metadata:
   name: "${REDIS_SERVICE_NAME}-redis-master"
 spec:
   containers:
-    containers:
-      - name: master
-        image: ' '
-        imagePullPolicy: Always
-        ports:
-          - containerPort: 6379
-            protocol: TCP
-        env:
-          - name: MASTER
-            value: "true"
-        resources:
-          limits:
-            memory: "${MEMORY_LIMIT}"
-        terminationMessagePath: /dev/termination-log
-        volumeMounts:
-          - mountPath: /redis-master-data
-            name: data
-      - name: sentinel
-        image: ' '
-        imagePullPolicy: Always
-        ports:
-          - containerPort: 26379
-            protocol: TCP
-        env:
-          - name: SENTINEL
-            value: "true"
-        resources:
-          limits:
-            memory: "${MEMORY_LIMIT}"
-        terminationMessagePath: /dev/termination-log
-        volumeMounts:
-          - mountPath: /redis-sentinel-data
-            name: data-sentinel
-    volumes:
-      - name: data
-        emptyDir: {}
-      - name: data-sentinel
-        emptyDir: {}        
+    - name: master
+      image: redis:v1.0.0
+      imagePullPolicy: Always
+      ports:
+        - containerPort: 6379
+          protocol: TCP
+      env:
+        - name: MASTER
+          value: "true"
+      resources:
+        limits:
+          memory: "${MEMORY_LIMIT}"
+      terminationMessagePath: /dev/termination-log
+      volumeMounts:
+        - mountPath: /redis-master-data
+          name: data
+    - name: sentinel
+      image: redis:v1.0.0
+      imagePullPolicy: Always
+      ports:
+        - containerPort: 26379
+          protocol: TCP
+      env:
+        - name: SENTINEL
+          value: "true"
+      resources:
+        limits:
+          memory: "${MEMORY_LIMIT}"
+      terminationMessagePath: /dev/termination-log
+      volumeMounts:
+        - mountPath: /redis-sentinel-data
+          name: data-sentinel
+  volumes:
+    - name: data
+      emptyDir: {}
+    - name: data-sentinel
+      emptyDir: {}
